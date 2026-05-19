@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Fruit Manager</title>
+
+    <style>
+
+        body{
+            font-family: Arial;
+            margin: 40px;
+        }
+
+        input{
+            padding: 8px;
+            margin: 5px;
+        }
+
+        button{
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        table{
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        table, th, td{
+            border: 1px solid black;
+        }
+
+        th, td{
+            padding: 10px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+
+<body>
+
+<h1>Fruit Manager</h1>
+
+<form id="fruitForm">
+
+    <input type="hidden" id="id">
+
+    <input type="text" id="name" placeholder="Name" required>
+
+    <input type="number" id="quantity" placeholder="Quantity" required>
+
+    <input type="number" id="price" placeholder="Price" required>
+
+    <input type="text" id="description" placeholder="Description">
+
+    <button type="submit">Save</button>
+
+</form>
+
+<hr>
+
+<table>
+
+    <thead>
+
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Description</th>
+            <th>Action</th>
+        </tr>
+
+    </thead>
+
+    <tbody id="fruitTable"></tbody>
+
+</table>
+
+<script>
+
+const API_URL = "/api/fruits";
+
+loadFruits();
+
+function loadFruits() {
+
+    fetch(API_URL)
+    .then(response => response.json())
+    .then(data => {
+
+        let rows = "";
+
+        data.forEach(fruit => {
+
+            rows += `
+                <tr>
+                    <td>${fruit.id}</td>
+                    <td>${fruit.name}</td>
+                    <td>${fruit.quantity}</td>
+                    <td>${fruit.price}</td>
+                    <td>${fruit.description || ""}</td>
+
+                    <td>
+
+                        <button onclick="editFruit(${fruit.id})">
+                            Edit
+                        </button>
+
+                        <button onclick="deleteFruit(${fruit.id})">
+                            Delete
+                        </button>
+
+                    </td>
+                </tr>
+            `;
+        });
+
+        document.getElementById("fruitTable").innerHTML = rows;
+    });
+
+}
+
+document.getElementById("fruitForm").addEventListener("submit", function(e){
+
+    e.preventDefault();
+
+    const id = document.getElementById("id").value;
+
+    const fruit = {
+
+        name: document.getElementById("name").value,
+        quantity: parseInt(document.getElementById("quantity").value),
+        price: parseFloat(document.getElementById("price").value),
+        description: document.getElementById("description").value
+
+    };
+
+    // CREATE
+    if(id === ""){
+
+        fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(fruit)
+
+        })
+        .then(() => {
+
+            resetForm();
+            loadFruits();
+
+        });
+
+    }
+
+    // UPDATE
+    else{
+
+        fetch(API_URL + "/" + id, {
+
+            method: "PUT",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify(fruit)
+
+        })
+        .then(() => {
+
+            resetForm();
+            loadFruits();
+
+        });
+
+    }
+
+});
+
+function editFruit(id){
+
+    fetch(API_URL + "/" + id)
+    .then(response => response.json())
+    .then(fruit => {
+
+        document.getElementById("id").value = fruit.id;
+        document.getElementById("name").value = fruit.name;
+        document.getElementById("quantity").value = fruit.quantity;
+        document.getElementById("price").value = fruit.price;
+        document.getElementById("description").value = fruit.description;
+
+    });
+
+}
+
+function deleteFruit(id){
+
+    if(confirm("Are you sure to delete this fruit?")){
+
+        fetch(API_URL + "/" + id, {
+
+            method: "DELETE"
+
+        })
+        .then(() => {
+
+            loadFruits();
+
+        });
+
+    }
+
+}
+
+function resetForm(){
+
+    document.getElementById("id").value = "";
+    document.getElementById("name").value = "";
+    document.getElementById("quantity").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("description").value = "";
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+# Java
+target/
+*.class
+
+# NetBeans
+nbproject/private/
+
+# VSCode
+.vscode/
+
+# NodeJS
+node_modules/
+dist/
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

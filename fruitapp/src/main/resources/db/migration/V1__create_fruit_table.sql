@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS fruit (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    quantity INTEGER NOT NULL,
+    price DOUBLE PRECISION NOT NULL,
+    description VARCHAR(500)
+);
