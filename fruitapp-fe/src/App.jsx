@@ -8,6 +8,8 @@ function App() {
 
   const [loggedIn, setLoggedIn] = useState(false)
 
+  const [currentUser, setCurrentUser] = useState(null)
+
   const [fruits, setFruits] = useState([])
 
   const [name, setName] = useState('')
@@ -16,10 +18,13 @@ function App() {
 
   const [editingId, setEditingId] = useState(null)
 
-  const authConfig = {
-    auth: {
-      username,
-      password
+  const getAuthConfig = () => {
+
+    return {
+      auth: {
+        username: username,
+        password: password
+      }
     }
   }
 
@@ -27,30 +32,54 @@ function App() {
 
     axios.get(
       'http://localhost:8080/api/fruits',
-      authConfig
+      getAuthConfig()
     )
 
     .then(res => {
+
       setFruits(res.data)
+
     })
 
     .catch(err => {
+
       console.log(err)
+
     })
   }
 
   const login = () => {
 
-    axios.get(
-      'http://localhost:8080/api/fruits',
-      authConfig
+    axios.post(
+      'http://localhost:8080/api/auth/login',
+      {
+        username,
+        password
+      }
     )
 
     .then(res => {
 
+      console.log(res.data)
+
       setLoggedIn(true)
 
-      setFruits(res.data)
+      setCurrentUser(res.data)
+
+      localStorage.setItem(
+        'user',
+        JSON.stringify(res.data)
+      )
+
+      localStorage.setItem(
+        'auth',
+        JSON.stringify({
+          username,
+          password
+        })
+      )
+
+      loadFruits()
 
     })
 
@@ -58,7 +87,7 @@ function App() {
 
       console.log(err)
 
-      alert("Login failed")
+      alert("Sai tài khoản hoặc mật khẩu")
 
     })
   }
@@ -67,10 +96,16 @@ function App() {
 
     setLoggedIn(false)
 
+    setCurrentUser(null)
+
     setFruits([])
 
     setUsername('')
     setPassword('')
+
+    localStorage.removeItem('user')
+
+    localStorage.removeItem('auth')
 
   }
 
@@ -85,7 +120,7 @@ function App() {
     axios.post(
       'http://localhost:8080/api/fruits',
       fruit,
-      authConfig
+      getAuthConfig()
     )
 
     .then(() => {
@@ -109,7 +144,7 @@ function App() {
 
     axios.delete(
       `http://localhost:8080/api/fruits/${id}`,
-      authConfig
+      getAuthConfig()
     )
 
     .then(() => {
@@ -150,7 +185,7 @@ function App() {
     axios.put(
       `http://localhost:8080/api/fruits/${editingId}`,
       fruit,
-      authConfig
+      getAuthConfig()
     )
 
     .then(() => {
@@ -180,7 +215,8 @@ function App() {
 
   }
 
-  const isAdmin = username === 'admin'
+  const isAdmin =
+    currentUser?.role === 'ADMIN'
 
   return (
 
@@ -195,7 +231,9 @@ function App() {
 
             <input
               placeholder="Username"
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={(e) =>
+                setUsername(e.target.value)
+              }
             />
 
             <br /><br />
@@ -203,7 +241,9 @@ function App() {
             <input
               type="password"
               placeholder="Password"
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
             />
 
             <br /><br />
@@ -223,8 +263,12 @@ function App() {
           <div>
 
             <h3>
-              Xin chào {username}
+              Xin chào {currentUser?.username}
             </h3>
+
+            <h4>
+              Role: {currentUser?.role}
+            </h4>
 
             <button onClick={logout}>
               Logout
@@ -248,7 +292,9 @@ function App() {
                   <input
                     placeholder="Name"
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) =>
+                      setName(e.target.value)
+                    }
                   />
 
                   <br /><br />
@@ -256,7 +302,9 @@ function App() {
                   <input
                     placeholder="Quantity"
                     value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
+                    onChange={(e) =>
+                      setQuantity(e.target.value)
+                    }
                   />
 
                   <br /><br />
@@ -264,7 +312,9 @@ function App() {
                   <input
                     placeholder="Price"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    onChange={(e) =>
+                      setPrice(e.target.value)
+                    }
                   />
 
                   <br /><br />
@@ -338,7 +388,9 @@ function App() {
                           <td>
 
                             <button
-                              onClick={() => editFruit(fruit)}
+                              onClick={() =>
+                                editFruit(fruit)
+                              }
                             >
                               Edit
                             </button>
@@ -375,3 +427,4 @@ function App() {
 }
 
 export default App
+

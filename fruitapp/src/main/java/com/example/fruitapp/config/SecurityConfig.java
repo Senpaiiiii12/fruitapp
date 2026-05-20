@@ -26,6 +26,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return NoOpPasswordEncoder.getInstance();
     }
 
@@ -58,6 +59,7 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
+
                 .cors(Customizer.withDefaults())
 
                 .csrf(csrf -> csrf.disable())
@@ -68,6 +70,11 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
+                        ).permitAll()
+
+                        // Authentication API
+                        .requestMatchers(
+                                "/api/auth/**"
                         ).permitAll()
 
                         // USER + ADMIN
