@@ -14,6 +14,8 @@ import org.springframework.http.ResponseEntity;
 
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:5173")
@@ -54,4 +56,37 @@ public class AuthController {
 
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/permissions/{username}")
+    public ResponseEntity<?> getPermissions(
+            @PathVariable String username
+    ) {
+
+        UserEntity user = userRepository
+                .findByUsername(username)
+                .orElse(null);
+
+        if (user == null) {
+
+            return ResponseEntity
+                    .badRequest()
+                    .body("User not found");
+        }
+
+        return ResponseEntity.ok(
+
+                Map.of(
+
+                        "username",
+                        user.getUsername(),
+
+                        "role",
+                        user.getRole(),
+
+                        "permissions",
+                        user.getRole().getPermissions()
+                )
+        );
+    }
 }
+
