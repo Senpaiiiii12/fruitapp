@@ -77,28 +77,41 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
 
+                        // USER MANAGEMENT
+                        // ADMIN ONLY
+                        .requestMatchers(
+                                "/api/users/**"
+                        ).hasRole("ADMIN")
+
+                        // VIEW FRUITS
                         // USER + ADMIN
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/api/fruits/**"
                         ).hasAnyRole("USER", "ADMIN")
 
-                        // ADMIN only
+                        // CREATE FRUIT
+                        // ADMIN ONLY
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/api/fruits/**"
                         ).hasRole("ADMIN")
 
+                        // UPDATE FRUIT
+                        // ADMIN ONLY
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/api/fruits/**"
                         ).hasRole("ADMIN")
 
+                        // DELETE FRUIT
+                        // ADMIN ONLY
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/api/fruits/**"
                         ).hasRole("ADMIN")
 
+                        // ALL OTHER REQUESTS
                         .anyRequest()
                         .authenticated()
                 )
@@ -108,3 +121,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+

@@ -12,6 +12,8 @@ function App() {
 
   const [fruits, setFruits] = useState([])
 
+  const [users, setUsers] = useState([])
+
   const [name, setName] = useState('')
   const [quantity, setQuantity] = useState('')
   const [price, setPrice] = useState('')
@@ -38,6 +40,26 @@ function App() {
     .then(res => {
 
       setFruits(res.data)
+
+    })
+
+    .catch(err => {
+
+      console.log(err)
+
+    })
+  }
+
+  const loadUsers = () => {
+
+    axios.get(
+      'http://localhost:8080/api/users',
+      getAuthConfig()
+    )
+
+    .then(res => {
+
+      setUsers(res.data)
 
     })
 
@@ -81,6 +103,12 @@ function App() {
 
       loadFruits()
 
+      if (res.data.role === 'ADMIN') {
+
+        loadUsers()
+
+      }
+
     })
 
     .catch(err => {
@@ -99,6 +127,8 @@ function App() {
     setCurrentUser(null)
 
     setFruits([])
+
+    setUsers([])
 
     setUsername('')
     setPassword('')
@@ -416,6 +446,56 @@ function App() {
               </tbody>
 
             </table>
+
+            {
+              isAdmin && (
+
+                <div>
+
+                  <hr />
+
+                  <h2>User Management</h2>
+
+                  <table border="1" cellPadding="10">
+
+                    <thead>
+
+                      <tr>
+
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Role</th>
+
+                      </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                      {
+                        users.map(user => (
+
+                          <tr key={user.id}>
+
+                            <td>{user.id}</td>
+
+                            <td>{user.username}</td>
+
+                            <td>{user.role}</td>
+
+                          </tr>
+
+                        ))
+                      }
+
+                    </tbody>
+
+                  </table>
+
+                </div>
+
+              )
+            }
 
           </div>
 
